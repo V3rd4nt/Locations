@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_small"
         android:textSize="17sp"
         android:text="@string/refresh_interval"
         android:id="@+id/check"/>
@@ -16,6 +17,7 @@
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_small"
         android:layout_below="@id/check"
         android:id="@+id/group"
         android:layout_weight="0.04">
@@ -23,15 +25,26 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Off"
+            android:contentDescription="1000000000"
+            android:id="@+id/button_off"
+            android:layout_weight="0.04"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="5 Seconds"
+            android:contentDescription="5000"
             android:id="@+id/button_5"
             android:layout_weight="0.04"
-            android:checked="true" />
+            android:checked="false" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10 Seconds"
+            android:contentDescription="10000"
             android:id="@+id/button_10"
             android:layout_weight="0.04"
             android:checked="false" />
@@ -40,6 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="20 Seconds"
+            android:contentDescription="20000"
             android:id="@+id/button_20"
             android:layout_weight="0.04"
             android:checked="false" />
@@ -48,6 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="30 Seconds"
+            android:contentDescription="30000"
             android:id="@+id/button_30"
             android:layout_weight="0.04"
             android:checked="false" />
@@ -56,19 +71,62 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1 Minute"
+            android:contentDescription="60000"
             android:id="@+id/button_1m"
             android:layout_weight="0.04"
-            android:checked="false" />
+            android:checked="true" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5 Minutes"
+            android:contentDescription="300000"
             android:id="@+id/button_5m"
             android:layout_weight="0.04"
             android:checked="false" />
 
     </RadioGroup>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:textSize="17sp"
+        android:text="@string/ip"
+        android:id="@+id/enter_ip"
+        android:layout_below="@id/group"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xlarge"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:layout_marginRight="@dimen/padding_small"
+        android:textSize="17sp"
+        android:id="@+id/ip"
+        android:layout_below="@id/group"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:textSize="17sp"
+        android:text="@string/port"
+        android:id="@+id/enter_port"
+        android:layout_below="@id/ip"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xlarge"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:ems="6"
+        android:textSize="17sp"
+        android:inputType="number"
+        android:id="@+id/port"
+        android:layout_below="@+id/ip"/>
 
     <Button
         android:layout_height="wrap_content"
@@ -77,6 +135,6 @@
         android:layout_centerHorizontal="true"
         android:text="@string/save"
         android:id="@+id/save"
-        android:layout_below="@id/group"/>
+        android:layout_below="@id/port"/>
 
 </RelativeLayout>

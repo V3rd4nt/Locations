@@ -5,6 +5,7 @@ package serveng.jku.at.locations;
  */
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SettingsActivity extends Activity {
@@ -21,6 +23,7 @@ public class SettingsActivity extends Activity {
     RadioGroup radioGroup;
     RadioButton radioButton;
     Button btnSave;
+    TextView ipTv, portTv;
     int choice;
     SharedPreferences sp;
 
@@ -29,8 +32,16 @@ public class SettingsActivity extends Activity {
         setContentView(R.layout.activity_settings);
         addListenerOnButton();
         sp = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        ipTv = (TextView) findViewById(R.id.ip);
+        portTv = (TextView) findViewById(R.id.port);
+
+        if (sp.contains("ipKey")) ipTv.setText(sp.getString("ipKey", ""));
+        if (sp.contains("portKey")) portTv.setText(sp.getString("portKey", ""));
         if (sp.contains("checkKey")) {
             switch(sp.getString("checkKey", "")) {
+                case "Off":
+                    radioGroup.check(R.id.button_off);
+                    break;
                 case "5 Seconds":
                     radioGroup.check(R.id.button_5);
                     break;
@@ -52,6 +63,15 @@ public class SettingsActivity extends Activity {
             }
         }
     }
+
+    public void save (Editor editor){
+        editor.commit();
+        Toast.makeText(getApplicationContext(), "Settings saved!", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     public void addListenerOnButton() {
 
         radioGroup = (RadioGroup) findViewById(R.id.group);
@@ -68,11 +88,11 @@ public class SettingsActivity extends Activity {
                 radioButton = (RadioButton) findViewById(choice);
 
                 Editor editor = sp.edit();
+                editor.putString("ipKey", ipTv.getText().toString());
+                editor.putString("portKey",  portTv.getText().toString());
                 editor.putString("checkKey", radioButton.getText().toString());
-                editor.commit();
-
-                Toast.makeText(getApplicationContext(), "Set the refresh interval to\n"+radioButton.getText().toString(), Toast.LENGTH_LONG).show();
-                finish();
+                editor.putLong("checkValue", Long.parseLong(radioButton.getContentDescription().toString()));
+                save (editor);
             }
         });
     }

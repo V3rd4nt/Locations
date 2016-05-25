@@ -5,12 +5,17 @@ package serveng.jku.at.locations;
  */
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,18 +24,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    GoogleMap mMap;
+    SharedPreferences sp;
+    Timer timer;
+    TimerTask timerTask;
+    final Handler handler = new Handler();
+    long period;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        sp = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
     }
 
     @Override
@@ -42,12 +55,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+    }
 
-        // Add a marker in Linz and move the camera
-        LatLng position = new LatLng(48.308351, 14.284837);
-        mMap.addMarker(new MarkerOptions().position(position).title("Linz Nibelungenbrücke"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startTimer();
+    }
+
+    public void startTimer() {
+        Toast.makeText(getApplicationContext(), sp.getString("checkKey", ""), Toast.LENGTH_LONG).show();
+        period = sp.getLong("checkValue", 60000L);
+        timer = new Timer();
+        initializeTimerTask();
+        timer.schedule(timerTask, 0L, period);
+    }
+
+    public void stoptimertask(View v) {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        mMap.clear();
+                        // Add a marker in Linz and move the camera
+                        LatLng position = new LatLng(48.308351, 14.284837);
+                        mMap.addMarker(new MarkerOptions().position(position).title("Linz Nibelungenbrücke"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+                    }
+                });
+            }
+        };
     }
 
     @Override
@@ -72,12 +117,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void menu_settings(){
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void menu_about() {
         new AlertDialog.Builder(this)
                 .setTitle("About:")
-                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n24.05.2016\nVersion 0.1")
+                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n24.05.2016\nVersion 0.2")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
