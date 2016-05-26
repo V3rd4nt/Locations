@@ -17,11 +17,13 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import java.net.HttpURLConnection;
+import java.net.UnknownHostException;
 
 public class JsonParser {
     static InputStream inputStream = null;
     static JSONObject jObj = null;
     static String json = "";
+    final String URL_SOURCE_DEFAULT = "http://skynet1.myds.me:2010/";
 
     public JSONObject getJSONFromUrl(String urlSource) {
         //make HTTP request
@@ -35,6 +37,10 @@ public class JsonParser {
         } catch (UnsupportedEncodingException e) {
             Log.e("JSON-PARSER", e.toString());
             e.printStackTrace();
+        } catch (UnknownHostException e) {
+            Log.e("JSON-PARSER", e.toString());
+            Log.w("JSON-PARSER", "Setting urlSource to default: " + URL_SOURCE_DEFAULT);
+            getJSONFromUrl(URL_SOURCE_DEFAULT);
         } catch (IOException e) {
             Log.e("JSON-PARSER", e.toString());
         }

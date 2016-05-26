@@ -20,8 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_small"
         android:layout_below="@id/check"
-        android:id="@+id/group"
-        android:layout_weight="0.04">
+        android:id="@+id/group">
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -96,6 +95,8 @@
         android:layout_marginLeft="@dimen/padding_small"
         android:layout_marginRight="@dimen/padding_small"
         android:textSize="17sp"
+        android:inputType="textUri"
+        android:text="@string/ip_default"
         android:id="@+id/ip"
         android:layout_below="@id/group"/>
 
@@ -117,12 +118,13 @@
         android:ems="5"
         android:textSize="17sp"
         android:inputType="number"
+        android:text="@string/port_default"
         android:id="@+id/port"
         android:layout_below="@+id/ip"/>
 
     <Button
         android:layout_height="wrap_content"
-        android:layout_width="300px"
+        android:layout_width="150dp"
         android:layout_marginTop="@dimen/padding_large"
         android:layout_centerHorizontal="true"
         android:text="@string/save"

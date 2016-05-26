@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void startTimer() {
         period = sp.getLong("checkValue", 60000L);
         Log.d("UPDATE-INTERVAL-VALUE", period+"");
-        Toast.makeText(getApplicationContext(), sp.getString("checkKey", ""), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_LONG).show();
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(timerTask, 0L, period);
