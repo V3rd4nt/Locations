@@ -6,4 +6,5 @@
     <string name="ip">IP-Address or Domain-Name:</string>
     <string name="port">Port:</string>
     <string name="save">Save</string>
+    <string name="off">Off</string>
 </resources>

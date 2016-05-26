@@ -1,6 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/startTimer"
+        android:orderInCategory="1"
+        android:showAsAction="never"
+        android:title="Refresh ON"/>
+
+    <item
+        android:id="@+id/stopTimer"
+        android:orderInCategory="1"
+        android:showAsAction="never"
+        android:title="Refresh OFF"/>
+
+    <item
         android:id="@+id/settings"
         android:orderInCategory="1"
         android:showAsAction="never"

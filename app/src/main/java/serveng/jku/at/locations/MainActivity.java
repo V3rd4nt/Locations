@@ -64,14 +64,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void startTimer() {
-        Toast.makeText(getApplicationContext(), sp.getString("checkKey", ""), Toast.LENGTH_LONG).show();
         period = sp.getLong("checkValue", 60000L);
+        Toast.makeText(getApplicationContext(), sp.getString("checkKey", ""), Toast.LENGTH_LONG).show();
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(timerTask, 0L, period);
     }
 
-    public void stoptimertask(View v) {
+    public void stopTimer() {
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -99,6 +99,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onOptionsItemSelected (MenuItem item) {
         super.onOptionsItemSelected(item);
         switch(item.getItemId()) {
+            case R.id.startTimer:
+                startTimer();
+                break;
+            case R.id.stopTimer:
+                stopTimer();
+                Toast.makeText(getApplicationContext(), "Turned off refresh", Toast.LENGTH_LONG).show();
+                break;
             case R.id.settings:
                 menu_settings();
                 break;
@@ -123,7 +130,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void menu_about() {
         new AlertDialog.Builder(this)
                 .setTitle("About:")
-                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n24.05.2016\nVersion 0.2")
+                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n26.05.2016\nVersion 1.3")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

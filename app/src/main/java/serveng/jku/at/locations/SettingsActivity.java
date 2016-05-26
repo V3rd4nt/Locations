@@ -39,9 +39,6 @@ public class SettingsActivity extends Activity {
         if (sp.contains("portKey")) portTv.setText(sp.getString("portKey", ""));
         if (sp.contains("checkKey")) {
             switch(sp.getString("checkKey", "")) {
-                case "Off":
-                    radioGroup.check(R.id.button_off);
-                    break;
                 case "5 Seconds":
                     radioGroup.check(R.id.button_5);
                     break;
@@ -64,8 +61,7 @@ public class SettingsActivity extends Activity {
         }
     }
 
-    public void save (Editor editor){
-        editor.commit();
+    public void save (){
         Toast.makeText(getApplicationContext(), "Settings saved!", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -92,7 +88,8 @@ public class SettingsActivity extends Activity {
                 editor.putString("portKey",  portTv.getText().toString());
                 editor.putString("checkKey", radioButton.getText().toString());
                 editor.putLong("checkValue", Long.parseLong(radioButton.getContentDescription().toString()));
-                save (editor);
+                editor.commit();
+                save();
             }
         });
     }
