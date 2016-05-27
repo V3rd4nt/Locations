@@ -25,15 +25,6 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5 Seconds"
-            android:contentDescription="5000"
-            android:id="@+id/button_5"
-            android:layout_weight="0.04"
-            android:checked="false" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="10 Seconds"
             android:contentDescription="10000"
             android:id="@+id/button_10"
@@ -66,6 +57,15 @@
             android:id="@+id/button_1m"
             android:layout_weight="0.04"
             android:checked="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3 Minutes"
+            android:contentDescription="180000"
+            android:id="@+id/button_3m"
+            android:layout_weight="0.04"
+            android:checked="false" />
 
         <RadioButton
             android:layout_width="wrap_content"

@@ -1,9 +1,5 @@
 package serveng.jku.at.locations;
 
-/**
- * Created by Peter on 24.05.2016.
- */
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,9 +35,6 @@ public class SettingsActivity extends Activity {
         if (sp.contains("portKey")) portTv.setText(sp.getString("portKey", ""));
         if (sp.contains("checkKey")) {
             switch(sp.getString("checkKey", "")) {
-                case "5 Seconds":
-                    radioGroup.check(R.id.button_5);
-                    break;
                 case "10 Seconds":
                     radioGroup.check(R.id.button_10);
                     break;
@@ -53,6 +46,9 @@ public class SettingsActivity extends Activity {
                     break;
                 case "1 Minute":
                     radioGroup.check(R.id.button_1m);
+                    break;
+                case "3 Minutes":
+                    radioGroup.check(R.id.button_3m);
                     break;
                 case "5 Minutes":
                     radioGroup.check(R.id.button_5m);

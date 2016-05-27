@@ -1,9 +1,5 @@
 package serveng.jku.at.locations;
 
-/**
- * Created by Peter on 26.05.2016.
- */
-
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -15,7 +11,6 @@ import java.net.URL;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.IOException;
-
 import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 
@@ -49,7 +44,7 @@ public class JsonParser {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"), 8);
             StringBuilder sb = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line + "\n");
             }

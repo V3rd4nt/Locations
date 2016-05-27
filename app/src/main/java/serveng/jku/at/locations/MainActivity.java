@@ -1,9 +1,5 @@
 package serveng.jku.at.locations;
 
-/**
- * Created by Peter on 24.05.2016.
- */
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,9 +13,11 @@ import android.view.MenuItem;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,6 +32,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     final Handler handler = new Handler();
     long period;
     PositionCreator pos;
+    Context context = this;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,8 +41,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sp = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
     }
 
@@ -56,6 +54,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //initial setting of the map view and position
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.306, 14.306)));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
     }
 
     @Override
@@ -66,8 +67,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void startTimer() {
         period = sp.getLong("checkValue", 60000L);
-        Log.d("UPDATE-INTERVAL-VALUE", period+"");
-        Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_LONG).show();
+        Log.d("UPDATE-INTERVAL-VALUE", String.valueOf(period));
+        Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_SHORT).show();
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(timerTask, 0L, period);
@@ -86,7 +87,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 handler.post(new Runnable() {
                     public void run() {
                         pos = new PositionCreator();
-                        pos.createPositions(mMap, sp);
+                        pos.createPositions(mMap, sp, context);
                     }
                 });
             }
@@ -98,11 +99,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onOptionsItemSelected(item);
         switch(item.getItemId()) {
             case R.id.startTimer:
+                Toast.makeText(getApplicationContext(), "Re-Enabled refresh", Toast.LENGTH_SHORT).show();
                 startTimer();
                 break;
             case R.id.stopTimer:
                 stopTimer();
-                Toast.makeText(getApplicationContext(), "Turned off refresh", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Disabled refresh", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
                 menu_settings();
@@ -128,7 +130,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void menu_about() {
         new AlertDialog.Builder(this)
                 .setTitle("About:")
-                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n26.05.2016\nVersion 1.4")
+                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n27.05.2016\nVersion 1.5")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

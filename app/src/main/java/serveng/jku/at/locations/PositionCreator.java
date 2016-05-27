@@ -1,25 +1,22 @@
 package serveng.jku.at.locations;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by Peter on 26.05.2016.
- */
 public class PositionCreator {
     String JsonStringUrl;
     JSONArray dataJsonArr;
+    ClusterManager<Position> clusterManager;
 
-    public GoogleMap createPositions (GoogleMap googleMap, SharedPreferences sp) {
-        GoogleMap mMap = googleMap;
+    public GoogleMap createPositions (GoogleMap mMap, SharedPreferences sp, Context context) {
         mMap.clear();
+        clusterManager = new ClusterManager<>(context, mMap);
 
          // set json string url
         JsonStringUrl = "http://"
@@ -36,21 +33,21 @@ public class PositionCreator {
             // get the array of points
             dataJsonArr = json.getJSONArray("points");
             // loop through all points
-            int posNr;
-            for (int i = 0; i < dataJsonArr.length(); i++) {
-                JSONObject c = dataJsonArr.getJSONObject(i);
-                // Storing each json item in LatLng variable
-                LatLng position = new LatLng(c.getDouble("latitude"), c.getDouble("longitude"));
-                // Add marker
-                posNr = i + 1;
-                Log.d("NEW-POSITION", "Pos " + posNr + " : " + position.toString());
-                mMap.addMarker(new MarkerOptions().position(position).title(String.valueOf(posNr)));
-            }
-            //TODO: Clustering
 
-            // move the camera over Linz in a specified zoom level
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.300412, 14.307861)));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+            for (int i = 0; i < dataJsonArr.length(); i++) {
+
+                JSONObject c = dataJsonArr.getJSONObject(i);
+                // Store each json item in Position object
+                Position position = new Position(c.getDouble("latitude"), c.getDouble("longitude"));
+                // Add position to the cluster
+                clusterManager.addItem(position);
+            }
+            Log.d("CLUSTERMANAGER", "All Positions successfully set");
+            // updates the cluster at each camera change
+            mMap.setOnCameraChangeListener(clusterManager);
+            // force recluster after each refresh interval
+            clusterManager.cluster();
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
