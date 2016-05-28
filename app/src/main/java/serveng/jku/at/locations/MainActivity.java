@@ -12,13 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.util.Log;
@@ -31,8 +31,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     TimerTask timerTask;
     final Handler handler = new Handler();
     long period;
-    PositionCreator pos;
+    PositionCreator pos = null;
     Context context = this;
+    String JsonStringUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         sp = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        // set json string url
+        JsonStringUrl = "http://" + sp.getString("ipKey", "skynet1.myds.me") + ":" + sp.getString("portKey", "2010") + "/";
+        testConnection(JsonStringUrl);
     }
 
     @Override
@@ -54,6 +59,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         //initial setting of the map view and position
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.306, 14.306)));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
@@ -87,7 +93,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 handler.post(new Runnable() {
                     public void run() {
                         pos = new PositionCreator();
-                        pos.createPositions(mMap, sp, context);
+                        pos.createPositions(mMap, JsonStringUrl, context, timer);
                     }
                 });
             }
@@ -104,6 +110,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case R.id.stopTimer:
                 stopTimer();
+                pos.disconnectFromServer();
                 Toast.makeText(getApplicationContext(), "Disabled refresh", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
@@ -129,8 +136,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void menu_about() {
         new AlertDialog.Builder(this)
-                .setTitle("About:")
-                .setMessage("This app was created by\nGroup 1\nService Engineering SS16\n27.05.2016\nVersion 1.5")
+                .setTitle("About this app:")
+                .setMessage("Created by\n  Group 1\n  Service Engineering SS16\n  28.05.2016\n  Version 1.6")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -140,9 +147,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void menu_quit() {
+        if (pos != null) pos.disconnectFromServer();
         finish();
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+    }
+
+    public void testConnection(String StringUrl) {
+        try {
+            URL url = new URL(StringUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(sp.getInt("timeOutValue", 3000));
+            Log.i("STATUS", String.valueOf(con.getResponseCode()));
+        }
+        catch (Exception e) {
+            Log.e("STATUS", e.toString());
+            menu_quit();
+        }
     }
 }
 

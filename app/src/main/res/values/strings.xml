@@ -8,4 +8,6 @@
     <string name="save">Save and return</string>
     <string name="ip_default">skynet1.myds.me</string>
     <string name="port_default">2010</string>
+    <string name="timeout">Connection timeout [ms]</string>
+    <string name="timeout_default">3000</string>
 </resources>

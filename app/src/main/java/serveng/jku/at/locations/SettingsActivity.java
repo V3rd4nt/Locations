@@ -19,7 +19,7 @@ public class SettingsActivity extends Activity {
     RadioGroup radioGroup;
     RadioButton radioButton;
     Button btnSave;
-    TextView ipTv, portTv;
+    TextView ipTv, portTv, timeOutTv;
     int choice;
     SharedPreferences sp;
 
@@ -30,6 +30,7 @@ public class SettingsActivity extends Activity {
         sp = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         ipTv = (TextView) findViewById(R.id.ip);
         portTv = (TextView) findViewById(R.id.port);
+        timeOutTv =(TextView) findViewById(R.id.timeout);
 
         if (sp.contains("ipKey")) ipTv.setText(sp.getString("ipKey", ""));
         if (sp.contains("portKey")) portTv.setText(sp.getString("portKey", ""));
@@ -82,6 +83,7 @@ public class SettingsActivity extends Activity {
                 Editor editor = sp.edit();
                 editor.putString("ipKey", ipTv.getText().toString());
                 editor.putString("portKey",  portTv.getText().toString());
+                editor.putInt("timeOutValue", Integer.parseInt(timeOutTv.getText().toString()));
                 editor.putString("checkKey", radioButton.getText().toString());
                 editor.putLong("checkValue", Long.parseLong(radioButton.getContentDescription().toString()));
                 editor.commit();

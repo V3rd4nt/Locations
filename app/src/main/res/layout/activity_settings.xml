@@ -89,11 +89,12 @@
         android:layout_below="@id/group"/>
 
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_xlarge"
         android:layout_marginLeft="@dimen/padding_small"
         android:layout_marginRight="@dimen/padding_small"
+        android:ems="12"
         android:textSize="17sp"
         android:inputType="textUri"
         android:text="@string/ip_default"
@@ -115,20 +116,42 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_xlarge"
         android:layout_marginLeft="@dimen/padding_small"
-        android:ems="5"
+        android:ems="4"
         android:textSize="17sp"
         android:inputType="number"
         android:text="@string/port_default"
         android:id="@+id/port"
         android:layout_below="@+id/ip"/>
 
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:textSize="17sp"
+        android:text="@string/timeout"
+        android:id="@+id/enter_timeout"
+        android:layout_below="@id/port"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_xlarge"
+        android:layout_marginLeft="@dimen/padding_small"
+        android:ems="4"
+        android:textSize="17sp"
+        android:inputType="number"
+        android:text="@string/timeout_default"
+        android:id="@+id/timeout"
+        android:layout_below="@+id/port"/>
+
     <Button
         android:layout_height="wrap_content"
-        android:layout_width="150dp"
-        android:layout_marginTop="@dimen/padding_large"
+        android:layout_width="160dp"
+        android:layout_marginTop="@dimen/padding_xlarge"
         android:layout_centerHorizontal="true"
         android:text="@string/save"
         android:id="@+id/save"
-        android:layout_below="@id/port"/>
+        android:layout_below="@id/timeout"/>
 
 </RelativeLayout>
