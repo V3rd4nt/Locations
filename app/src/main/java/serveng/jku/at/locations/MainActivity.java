@@ -34,6 +34,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     PositionCreator pos = null;
     Context context = this;
     String JsonStringUrl;
+    int timeOut;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // set json string url
         JsonStringUrl = "http://" + sp.getString("ipKey", "skynet1.myds.me") + ":" + sp.getString("portKey", "2010") + "/";
+        timeOut = sp.getInt("timeOutValue", 3000);
         testConnection(JsonStringUrl);
     }
 
@@ -93,7 +95,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 handler.post(new Runnable() {
                     public void run() {
                         pos = new PositionCreator();
-                        pos.createPositions(mMap, JsonStringUrl, context, timer);
+                        pos.createPositions(mMap, JsonStringUrl, context, timer, timeOut);
                     }
                 });
             }
@@ -157,7 +159,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         try {
             URL url = new URL(StringUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(sp.getInt("timeOutValue", 3000));
+            con.setConnectTimeout(timeOut);
             Log.i("STATUS", String.valueOf(con.getResponseCode()));
         }
         catch (Exception e) {

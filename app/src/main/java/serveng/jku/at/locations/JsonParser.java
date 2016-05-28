@@ -26,9 +26,8 @@ public class JsonParser {
     HttpURLConnection urlConnection = null;
     SharedPreferences sp;
 
-    public JSONObject getJSONFromUrl(String urlSource, Context context, Timer timer) {
+    public JSONObject getJSONFromUrl(String urlSource, Context context, Timer timer, int timeOut) {
         // Load shared preferences to get timeout value
-        sp = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
         // Make HTTP request
         try {
@@ -36,7 +35,7 @@ public class JsonParser {
             urlConnection = (HttpURLConnection) url.openConnection();
 
             // Time to wait if server is unreachable until throwing exception
-            urlConnection.setConnectTimeout(sp.getInt("timeOutValue", 3000));
+            urlConnection.setConnectTimeout(timeOut);
             // Http-GET Requesrt
             urlConnection.setRequestMethod("GET");
             urlConnection.setChunkedStreamingMode(0);
@@ -50,7 +49,7 @@ public class JsonParser {
         } catch (UnknownHostException e) {
             Log.e("JSON-PARSER", e.toString());
             Log.w("JSON-PARSER", "Setting urlSource to default: " + URL_SOURCE_DEFAULT);
-            getJSONFromUrl(URL_SOURCE_DEFAULT, context, timer);
+            getJSONFromUrl(URL_SOURCE_DEFAULT, context, timer, timeOut);
 
         // Connection to server lost
         } catch (IOException e) {

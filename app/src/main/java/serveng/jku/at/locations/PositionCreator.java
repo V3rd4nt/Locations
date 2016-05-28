@@ -15,7 +15,7 @@ public class PositionCreator {
     ClusterManager<Position> clusterManager;
     JsonParser jParser = null;
 
-    public GoogleMap createPositions (GoogleMap mMap, String JsonStringUrl, Context context, Timer timer) {
+    public GoogleMap createPositions (GoogleMap mMap, String JsonStringUrl, Context context, Timer timer, int timeOut) {
         mMap.clear();
         clusterManager = new ClusterManager<>(context, mMap);
         Log.d("NODEJS-SERVER-URL", JsonStringUrl);
@@ -24,7 +24,7 @@ public class PositionCreator {
         try {
             jParser = new JsonParser();
             // get json string from url
-            json = jParser.getJSONFromUrl(JsonStringUrl, context, timer);
+            json = jParser.getJSONFromUrl(JsonStringUrl, context, timer, timeOut);
             // get the array of points
             dataJsonArr = json.getJSONArray("points");
             // loop through all points
