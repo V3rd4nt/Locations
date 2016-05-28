@@ -34,6 +34,7 @@ public class SettingsActivity extends Activity {
 
         if (sp.contains("ipKey")) ipTv.setText(sp.getString("ipKey", ""));
         if (sp.contains("portKey")) portTv.setText(sp.getString("portKey", ""));
+        if (sp.contains("timeOutValue")) timeOutTv.setText(String.valueOf(sp.getInt("timeOutValue", 3000)));
         if (sp.contains("checkKey")) {
             switch(sp.getString("checkKey", "")) {
                 case "10 Seconds":
