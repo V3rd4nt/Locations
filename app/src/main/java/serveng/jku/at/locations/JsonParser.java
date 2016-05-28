@@ -1,7 +1,6 @@
 package serveng.jku.at.locations;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 import java.io.BufferedInputStream;
@@ -24,7 +23,7 @@ public class JsonParser {
     static String json = "";
     final String URL_SOURCE_DEFAULT = "http://skynet1.myds.me:2010/";
     HttpURLConnection urlConnection = null;
-    SharedPreferences sp;
+    boolean connection = true;
 
     public JSONObject getJSONFromUrl(String urlSource, Context context, Timer timer, int timeOut) {
         // Load shared preferences to get timeout value
@@ -45,20 +44,30 @@ public class JsonParser {
         } catch (UnsupportedEncodingException e) {
             Log.e("JSON-PARSER", e.toString());
 
-        // Malformer IP-address and/or port
+        // Malformer IP-address and/or port or turned off Wifi or 3G/4G
         } catch (UnknownHostException e) {
             Log.e("JSON-PARSER", e.toString());
-            Log.w("JSON-PARSER", "Setting urlSource to default: " + URL_SOURCE_DEFAULT);
-            getJSONFromUrl(URL_SOURCE_DEFAULT, context, timer, timeOut);
+
+            // Possible reason malformed input settings
+            if (connection) {
+                Log.w("JSON-PARSER", "Setting urlSource to default: " + URL_SOURCE_DEFAULT);
+                connection = false;
+
+                // Try again with default settings
+                getJSONFromUrl(URL_SOURCE_DEFAULT, context, timer, timeOut);
+
+            // otherwise disable refresh and close connection
+            } else lostConnection(context, e, urlConnection, timer);
+
 
         // Connection to server lost
         } catch (IOException e) {
-            Log.e("JSON-PARSER", e.toString());
-            urlConnection.disconnect();
-            Toast.makeText(context, "Lost connection to server", Toast.LENGTH_SHORT).show();
-            timer.cancel();
+
+            // Disable Refresh and close connection
+            lostConnection(context, e, urlConnection, timer);
         }
         Log.d("JSON-PARSER", "Connected to the server");
+        connection = true;
 
         //Read JSON data from inputStream
         try {
@@ -90,5 +99,12 @@ public class JsonParser {
             urlConnection.disconnect();
             Log.d("JSON-PARSER", "Disconnecting from server successful");
         } else Log.w("JSON-PARSER", "Disconnecting from server failed");
+    }
+
+    private void lostConnection(Context context, Exception e, HttpURLConnection urlConnection, Timer timer) {
+        Log.e("JSON-PARSER", e.toString());
+        urlConnection.disconnect();
+        Toast.makeText(context, "Lost connection to server", Toast.LENGTH_SHORT).show();
+        timer.cancel();
     }
 }
