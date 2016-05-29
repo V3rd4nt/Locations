@@ -60,7 +60,7 @@ public class SettingsActivity extends Activity {
     }
 
     public void save (){
-        Toast.makeText(getApplicationContext(), "Settings saved!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Settings saved!", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

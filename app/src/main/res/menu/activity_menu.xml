@@ -1,32 +1,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/startTimer"
+        android:id="@+id/ShowMyPos"
         android:orderInCategory="1"
+        android:showAsAction="always"
+        android:title="Show My Pos"/>
+
+    <item
+        android:id="@+id/startTimer"
+        android:orderInCategory="2"
         android:showAsAction="never"
         android:title="Refresh ON"/>
 
     <item
         android:id="@+id/stopTimer"
-        android:orderInCategory="1"
+        android:orderInCategory="3"
         android:showAsAction="never"
         android:title="Refresh OFF"/>
 
     <item
         android:id="@+id/settings"
-        android:orderInCategory="1"
+        android:orderInCategory="4"
         android:showAsAction="never"
         android:title="Settings"/>
 
     <item
         android:id="@+id/about"
-        android:orderInCategory="2"
+        android:orderInCategory="5"
         android:showAsAction="never"
         android:title="About"/>
 
     <item
         android:id="@+id/quit"
-        android:orderInCategory="3"
+        android:orderInCategory="6"
         android:showAsAction="never"
         android:title="Quit"/>
 

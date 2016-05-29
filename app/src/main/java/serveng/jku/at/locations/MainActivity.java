@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -44,7 +45,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private GoogleMap mMap;
+    GoogleMap mMap = null;
     SharedPreferences sp;
     Timer timer;
     TimerTask timerTask;
@@ -54,6 +55,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Context context = this;
     String JsonStringUrl;
     int timeOut;
+    boolean loaded = false;
 
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
@@ -71,9 +73,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         StrictMode.setThreadPolicy(policy);
 
         // set json string url
-        JsonStringUrl = "http://" + sp.getString("ipKey", "skynet1.myds.me") + ":" + sp.getString("portKey", "2010") + "/";
+        JsonStringUrl = setJsonStringUrl();
+        // set connection timeout
         timeOut = sp.getInt("timeOutValue", 3000);
-//        testConnection(JsonStringUrl);
+        testConnection(JsonStringUrl);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -82,6 +85,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        // connect google api client
+        buildGoogleApiClient();
+        // set intial map view after changing settings
     }
 
     @Override
@@ -90,23 +96,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+    private void setInitialCamPos() {
+        //move map camera over Linz
+        mMap.clear();
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.306, 14.306)));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        //Initialize Google Play Services
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
-                mMap.setMyLocationEnabled(true);
-            }
-        }
-        else {
-            buildGoogleApiClient();
+        // Check permissions and enable gps to find user location
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
+        // set intial map view at first map load
+        setInitialCamPos();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -141,17 +148,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
+    }
+
+    public void setCameraAtMyLocation() {
 
         //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        markerOptions.title("My Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
         //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
 
         //stop location updates
@@ -212,7 +222,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 } else {
                     // Permission denied, Disable the functionality that depends on this permission.
-                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -229,7 +239,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void startTimer() {
         period = sp.getLong("checkValue", 60000L);
-        Log.d("UPDATE-INTERVAL-VALUE", String.valueOf(period));
+        Log.d("MAIN-START-TIMER", "Update interval value: "+String.valueOf(period));
         Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_SHORT).show();
         timer = new Timer();
         initializeTimerTask();
@@ -243,13 +253,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private String setJsonStringUrl() {
+        return "http://" + sp.getString("ipKey", context.getResources().getString(R.string.ip_default)) +
+                ":" + sp.getString("portKey", context.getResources().getString(R.string.port_default)) + "/";
+    }
+
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
                         pos = new PositionCreator();
-                        pos.createPositions(mMap, JsonStringUrl, context, timer, timeOut);
+                        try {
+                            pos.createPositions(mMap, context, timer, timeOut, JsonStringUrl);
+                        } catch (NullPointerException e) {
+                            Log.e("MAIN-INIT-TIMER-TASK", e.toString());
+                            menu_quit();
+                        }
                     }
                 });
             }
@@ -260,6 +280,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onOptionsItemSelected (MenuItem item) {
         super.onOptionsItemSelected(item);
         switch(item.getItemId()) {
+            case R.id.ShowMyPos:
+                setCameraAtMyLocation();
+                break;
             case R.id.startTimer:
                 Toast.makeText(getApplicationContext(), "Re-Enabled refresh", Toast.LENGTH_SHORT).show();
                 startTimer();
@@ -293,7 +316,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void menu_about() {
         new AlertDialog.Builder(this)
                 .setTitle("About this app:")
-                .setMessage("Created by\n  Group 1\n  Service Engineering SS16\n  28.05.2016\n  Version 1.6")
+                .setMessage("Created by\n  " +
+                        "Group 1\n  " +
+                        "Service Engineering SS16\n  " +
+                        "29.05.2016\n  " +
+                        "Version 1.8")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -314,11 +341,29 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             URL url = new URL(StringUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(timeOut);
-            Log.i("STATUS", String.valueOf(con.getResponseCode()));
+            Log.i("MAIN-TEST-CONNECTION", String.valueOf(con.getResponseCode()));
         }
         catch (Exception e) {
-            Log.e("STATUS", e.toString());
-            menu_quit();
+            Log.e("MAIN-TEST-CONNECTION", e.toString());
+            new AlertDialog.Builder(context)
+                    .setTitle("Unknown Host")
+                    .setMessage("Could not connect to specified host.\n" +
+                            "Trying to connect to default host.\n" +
+                            "Do you want to reset settings to default?")
+                    .setPositiveButton("Yes, reset", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            Editor editor = sp.edit();
+                            editor.putString("ipKey", getResources().getString(R.string.ip_default));
+                            editor.putString("portKey", getResources().getString(R.string.port_default));
+                            editor.commit();
+                            JsonStringUrl = setJsonStringUrl();
+                            startTimer();
+
+                        }
+                    }).setNegativeButton("No", null)
+                    .show();
         }
     }
 }

@@ -14,11 +14,13 @@ public class PositionCreator {
     JSONObject json, c;
     ClusterManager<Position> clusterManager;
     JsonParser jParser = null;
+    String JsonStringUrl;
 
-    public GoogleMap createPositions (GoogleMap mMap, String JsonStringUrl, Context context, Timer timer, int timeOut) {
+    public GoogleMap createPositions (GoogleMap mMap, Context context, Timer timer, int timeOut, String JsonStringUrl) {
+
         mMap.clear();
         clusterManager = new ClusterManager<>(context, mMap);
-        Log.d("NODEJS-SERVER-URL", JsonStringUrl);
+        Log.d("POSITION-CREATOR", "Set Server-URL: " + JsonStringUrl);
         dataJsonArr = null;
 
         try {
@@ -37,7 +39,7 @@ public class PositionCreator {
                 // Add position to the cluster
                 clusterManager.addItem(position);
             }
-            Log.d("CLUSTERMANAGER", "All Positions successfully set");
+            Log.d("POSITION-CREATOR", "All Positions successfully set by Cluster-manager");
             // updates the cluster at each camera change
             mMap.setOnCameraChangeListener(clusterManager);
             // force recluster after each refresh interval
