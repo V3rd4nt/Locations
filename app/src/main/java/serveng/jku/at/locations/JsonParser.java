@@ -44,23 +44,20 @@ public class JsonParser {
         } catch (UnsupportedEncodingException e) {
             Log.e("JSON-PARSER-GET-JSON", e.toString());
 
-        // Malformer IP-address and/or port or turned off Wifi or 3G/4G
+        // Malformed IP-address and/or port or turned off Wifi or 3G/4G
         } catch (UnknownHostException e) {
             Log.e("JSON-PARSER-GET-JSON", e.toString());
 
             // Possible reason malformed input settings
             if (connection) {
                 Log.w("JSON-PARSER-GET-JSON", "Setting urlSource to default: " +
-                        "http://" + context.getResources().getString(R.string.ip_default) +
-                ":" + context.getResources().getString(R.string.port_default) + "/");
+                        "http://" + context.getResources().getString(R.string.ip_default) + ":" + context.getResources().getString(R.string.port_default) + "/");
                 connection = false;
 
                 // Try again with default settings
-                getJSONFromUrl("http://" + context.getResources().getString(R.string.ip_default) +
-                        ":" + context.getResources().getString(R.string.port_default) + "/",
-                        context, timer, timeOut);
+                getJSONFromUrl("http://" + context.getResources().getString(R.string.ip_default) + ":" + context.getResources().getString(R.string.port_default) + "/", context, timer, timeOut);
 
-            // otherwise disable refresh and close connectionw
+            // otherwise disable refresh and close connection
             } else {
                 lostConnection(context, e, urlConnection, timer);
             }

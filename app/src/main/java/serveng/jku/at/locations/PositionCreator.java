@@ -14,11 +14,9 @@ public class PositionCreator {
     JSONObject json, c;
     ClusterManager<Position> clusterManager;
     JsonParser jParser = null;
-    String JsonStringUrl;
 
     public GoogleMap createPositions (GoogleMap mMap, Context context, Timer timer, int timeOut, String JsonStringUrl) {
 
-        mMap.clear();
         clusterManager = new ClusterManager<>(context, mMap);
         Log.d("POSITION-CREATOR", "Set Server-URL: " + JsonStringUrl);
         dataJsonArr = null;

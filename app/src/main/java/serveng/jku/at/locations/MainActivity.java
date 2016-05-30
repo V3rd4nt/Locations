@@ -30,10 +30,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+//import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+//import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,8 +55,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Context context = this;
     String JsonStringUrl;
     int timeOut;
-    boolean loaded = false;
-
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
@@ -75,7 +73,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // set json string url
         JsonStringUrl = setJsonStringUrl();
         // set connection timeout
-        timeOut = sp.getInt("timeOutValue", 3000);
+        timeOut = sp.getInt("timeOutValue", Integer.valueOf(context.getResources().getString(R.string.timeout_default)));
         testConnection(JsonStringUrl);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -87,7 +85,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         // connect google api client
         buildGoogleApiClient();
-        // set intial map view after changing settings
     }
 
     @Override
@@ -98,7 +95,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void setInitialCamPos() {
         //move map camera over Linz
-        mMap.clear();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(48.306, 14.306)));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
     }
@@ -150,25 +146,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void setCameraAtMyLocation() {
+   /* public void setMarkerAtMyLocation() {
 
         //Place current location marker
         LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("My Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.5f));
 
         //stop location updates
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
-    }
+    }*/
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -203,8 +198,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -263,6 +257,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
+                        mMap.clear();
                         pos = new PositionCreator();
                         try {
                             pos.createPositions(mMap, context, timer, timeOut, JsonStringUrl);
@@ -280,8 +275,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onOptionsItemSelected (MenuItem item) {
         super.onOptionsItemSelected(item);
         switch(item.getItemId()) {
-            case R.id.ShowMyPos:
-                setCameraAtMyLocation();
+            case R.id.resetView:
+                setInitialCamPos();
                 break;
             case R.id.startTimer:
                 Toast.makeText(getApplicationContext(), "Re-Enabled refresh", Toast.LENGTH_SHORT).show();
@@ -319,8 +314,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .setMessage("Created by\n  " +
                         "Group 1\n  " +
                         "Service Engineering SS16\n  " +
-                        "29.05.2016\n  " +
-                        "Version 1.8")
+                        "30.05.2016\n  " +
+                        "Version 1.9")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -345,11 +340,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
         catch (Exception e) {
             Log.e("MAIN-TEST-CONNECTION", e.toString());
+            stopTimer();
             new AlertDialog.Builder(context)
                     .setTitle("Unknown Host")
-                    .setMessage("Could not connect to specified host.\n" +
-                            "Trying to connect to default host.\n" +
-                            "Do you want to reset settings to default?")
+                    .setMessage("Could not connect to host.\n" +
+                            "Do you want to reset settings to\n" +
+                            "default and try again?")
                     .setPositiveButton("Yes, reset", new DialogInterface.OnClickListener()
                     {
                         @Override
@@ -360,7 +356,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             editor.commit();
                             JsonStringUrl = setJsonStringUrl();
                             startTimer();
-
                         }
                     }).setNegativeButton("No", null)
                     .show();
