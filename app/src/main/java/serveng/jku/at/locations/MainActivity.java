@@ -59,6 +59,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
+    boolean connectionStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         JsonStringUrl = setJsonStringUrl();
         // set connection timeout
         timeOut = sp.getInt("timeOutValue", Integer.valueOf(context.getResources().getString(R.string.timeout_default)));
-        testConnection(JsonStringUrl);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -85,6 +85,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         // connect google api client
         buildGoogleApiClient();
+        // test connection to server
+        connectionStatus = testConnection(JsonStringUrl);
     }
 
     @Override
@@ -145,25 +147,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             mCurrLocationMarker.remove();
         }
     }
-
-   /* public void setMarkerAtMyLocation() {
-
-        //Place current location marker
-        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("My Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
-        mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude())));
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }*/
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -232,12 +215,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void startTimer() {
-        period = sp.getLong("checkValue", 60000L);
-        Log.d("MAIN-START-TIMER", "Update interval value: "+String.valueOf(period));
-        Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_SHORT).show();
-        timer = new Timer();
-        initializeTimerTask();
-        timer.schedule(timerTask, 0L, period);
+        if (connectionStatus) {
+            period = sp.getLong("checkValue", 60000L);
+            Log.i("MAIN-START-TIMER", "Update interval value: " + String.valueOf(period));
+            Toast.makeText(getApplicationContext(), sp.getString("checkKey", "1 Minute"), Toast.LENGTH_SHORT).show();
+            timer = new Timer();
+            initializeTimerTask();
+            timer.schedule(timerTask, 0L, period);
+        }
     }
 
     public void stopTimer() {
@@ -257,6 +242,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             public void run() {
                 handler.post(new Runnable() {
                     public void run() {
+                        Log.i("MAIN-INIT-TIMER-TASK", "Timer set to: " + period);
                         mMap.clear();
                         pos = new PositionCreator();
                         try {
@@ -279,7 +265,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 setInitialCamPos();
                 break;
             case R.id.startTimer:
-                Toast.makeText(getApplicationContext(), "Re-Enabled refresh", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Enabled refresh", Toast.LENGTH_SHORT).show();
                 startTimer();
                 break;
             case R.id.stopTimer:
@@ -288,6 +274,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(getApplicationContext(), "Disabled refresh", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
+                stopTimer();
                 menu_settings();
                 break;
             case R.id.about:
@@ -314,8 +301,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .setMessage("Created by\n  " +
                         "Group 1\n  " +
                         "Service Engineering SS16\n  " +
-                        "30.05.2016\n  " +
-                        "Version 1.9")
+                        "12.06.2016\n  " +
+                        "Version 2.0")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -331,7 +318,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
     }
 
-    public void testConnection(String StringUrl) {
+    public boolean testConnection(String StringUrl) {
         try {
             URL url = new URL(StringUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -355,10 +342,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             editor.putString("portKey", getResources().getString(R.string.port_default));
                             editor.commit();
                             JsonStringUrl = setJsonStringUrl();
+                            connectionStatus = true;
                             startTimer();
                         }
                     }).setNegativeButton("No", null)
                     .show();
+            return false;
         }
+        return true;
     }
 }

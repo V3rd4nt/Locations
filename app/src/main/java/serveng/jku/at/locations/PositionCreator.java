@@ -37,7 +37,6 @@ public class PositionCreator {
                 // Add position to the cluster
                 clusterManager.addItem(position);
             }
-            Log.d("POSITION-CREATOR", "All Positions successfully set by Cluster-manager");
             // updates the cluster at each camera change
             mMap.setOnCameraChangeListener(clusterManager);
             // force recluster after each refresh interval

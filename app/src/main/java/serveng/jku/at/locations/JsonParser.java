@@ -69,7 +69,7 @@ public class JsonParser {
             // Disable Refresh and close connection
             lostConnection(context, e, urlConnection, timer);
         }
-        Log.d("JSON-PARSER-GET-JSON", "Connected to the server");
+        Log.d("JSON-PARSER-GET-JSON", "Connecting to server...");
         connection = true;
 
         //Read JSON data from inputStream
@@ -100,8 +100,7 @@ public class JsonParser {
     public void disconnect() {
         if (urlConnection != null) {
             urlConnection.disconnect();
-            Log.d("JSON-PARSER-DISCONNECT", "Disconnecting from server successful");
-        } else Log.w("JSON-PARSER-DISCONNECT", "Disconnecting from server failed");
+        }
     }
 
     private void lostConnection(Context context, Exception e, HttpURLConnection urlConnection, Timer timer) {

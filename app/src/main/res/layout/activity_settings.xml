@@ -94,7 +94,7 @@
         android:layout_marginTop="@dimen/padding_xlarge"
         android:layout_marginLeft="@dimen/padding_small"
         android:layout_marginRight="@dimen/padding_small"
-        android:ems="12"
+        android:ems="15"
         android:textSize="17sp"
         android:inputType="textUri"
         android:text="@string/ip_default"
