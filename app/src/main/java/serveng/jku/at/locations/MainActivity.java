@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import android.os.Handler;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -30,10 +29,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-//import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -234,7 +231,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String setJsonStringUrl() {
         return "http://" + sp.getString("ipKey", context.getResources().getString(R.string.ip_default)) +
-                ":" + sp.getString("portKey", context.getResources().getString(R.string.port_default)) + "/";
+                ":" + sp.getString("portKey", context.getResources().getString(R.string.port_default)) + "/login";
     }
 
     public void initializeTimerTask() {
@@ -301,8 +298,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .setMessage("Created by\n  " +
                         "Group 1\n  " +
                         "Service Engineering SS16\n  " +
-                        "12.06.2016\n  " +
-                        "Version 2.0")
+                        "18.06.2016\n  " +
+                        "Version 2.1")
                 .setNeutralButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

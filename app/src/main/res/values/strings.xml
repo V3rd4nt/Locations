@@ -6,7 +6,7 @@
     <string name="ip">IP-Address or Domain-Name:</string>
     <string name="port">Port:</string>
     <string name="save">Save and return</string>
-    <string name="ip_default">locations-serveng.rhcloud.com</string>
+    <string name="ip_default">group1-serveng.rhcloud.com</string>
     <string name="port_default">80</string>
     <string name="timeout">Connection timeout [ms]</string>
     <string name="timeout_default">3000</string>
